@@ -37,14 +37,21 @@ public class OAuthRequestActivity extends AppCompatActivity {
                             .getAuthheader();
 
             Log.d("lala",header);
-            //Now this header string will be added as a header as {Authorization: header string} to each request
-            //Set the 4 keys , signature method , version and include entity only once
-            //while making th oAuthObject or making the first request
 
-            //This whole header calculation can be done in the API interface of retrofit while using one oAuthClass object
+            /*Now this header string will be added as a header as {Authorization: header string} to each request
+            Set the 4 keys , signature method , version and include entity only once
+            while making th oAuthObject or making the first request
 
-            //Refer to the link https://dev.twitter.com/oauth/overview/authorizing-requests for more details
+            This whole header calculation can be done in the API interface of retrofit while using one oAuthClass object
 
+            Refer to the link https://dev.twitter.com/oauth/overview/authorizing-requests for more details
+            */
+
+            Log.d("lala",oAuthClass.displaySignature());
+            /*This function displays the signature that is generated internally using the oAuth header and other details
+
+            Refer to https://dev.twitter.com/oauth/overview/creating-signatures for more details
+            */
         } catch (Exception e) {
             Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
             e.printStackTrace();

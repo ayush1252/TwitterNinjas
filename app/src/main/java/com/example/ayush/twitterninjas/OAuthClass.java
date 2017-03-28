@@ -45,6 +45,11 @@ public class OAuthClass {
 
     }
 
+    public String displaySignature()
+    {
+        return signature;
+    }
+
     String Authheader;
     HashMap<String,String> body;
     String include_entities;
@@ -147,6 +152,8 @@ public class OAuthClass {
         signaturekey=this.getSignatureKey();
         signature=null;
         this.signature=sign(signaturebase,signaturekey);
+        String[] temp= signature.split("\n");
+        signature=temp[0]; //Because signature is somehow ending with /n
 
     }
 
