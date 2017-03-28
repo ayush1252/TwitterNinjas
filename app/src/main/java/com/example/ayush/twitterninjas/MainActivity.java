@@ -9,10 +9,12 @@ import android.widget.Toast;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
+import com.twitter.sdk.android.core.SessionManager;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterAuthToken;
 import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
+import com.twitter.sdk.android.core.identity.TwitterAuthClient;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
 import io.fabric.sdk.android.Fabric;
@@ -20,8 +22,8 @@ import io.fabric.sdk.android.Fabric;
 public class MainActivity extends AppCompatActivity {
 
     //Consumer Keys:- This you will get when you make an app on twitter dev account
-    private static final String TWITTER_KEY = "QsuwC1feNbi3s97orZqhscb4r";
-    private static final String TWITTER_SECRET = "JpbXf2n1iJBvLKxIDTmU4gxMrsTAJin7Tfq64SCIjRLxIZLk8O";
+    private static final String TWITTER_KEY = "qkue9Tt4G1CIIdeJro3RtPuVB";
+    private static final String TWITTER_SECRET = "fRnX3drFB6VULaUsL1Vp3XdY2GhS0iRI8fKrhu5eGn1eYIhLwp";
     private TwitterLoginButton loginButton;
 
 
@@ -42,9 +44,10 @@ public class MainActivity extends AppCompatActivity {
             public void success(Result<TwitterSession> result) {
 
                 TwitterSession session = result.data;
+
                 //Code that can be used if you want access to user's email , but you should make sure
                 //that the app has email permissions in the developer account section
-                /*
+
                 TwitterAuthClient authClient = new TwitterAuthClient();
                 authClient.requestEmail(session, new Callback<String>() {
                     @Override
@@ -58,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this, exception.toString(), Toast.LENGTH_SHORT).show();
 
                     }
-                });*/
+                });
                 TwitterAuthToken authToken = session.getAuthToken();
                 String token = authToken.token;
                 String secret = authToken.secret;
