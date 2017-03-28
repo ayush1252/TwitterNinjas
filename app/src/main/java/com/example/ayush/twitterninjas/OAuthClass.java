@@ -40,7 +40,6 @@ public class OAuthClass {
                         +URLEncoder.encode("oauth_timestamp","UTF-8")+"=\""+URLEncoder.encode(oauth_timestamp,"UTF-8")+"\", "
                     +URLEncoder.encode("oauth_token","UTF-8")+"=\""+URLEncoder.encode(oauth_token,"UTF-8")+"\", "
                     +URLEncoder.encode("oauth_version","UTF-8")+"=\""+URLEncoder.encode(oauth_version,"UTF-8")+"\"";
-
             return Authheader;
 
     }
@@ -52,7 +51,7 @@ public class OAuthClass {
 
     String Authheader;
     HashMap<String,String> body;
-    String include_entities;
+
     String oauth_consumer_key;
     String oauth_nonce;
     String oauth_signature_method;
@@ -112,10 +111,6 @@ public class OAuthClass {
         return this;
     }
 
-    public OAuthClass setInclude_entities(String include_entities) {
-        this.include_entities = include_entities;
-        return this;
-    }
 
     public OAuthClass setOauth_consumer_key(String oauth_consumer_key) {
         this.oauth_consumer_key = oauth_consumer_key;
@@ -168,8 +163,7 @@ public class OAuthClass {
 
     private String getSignatureBase() throws UnsupportedEncodingException {
         HashMap<String,String>parameters = new HashMap<String, String>();
-       if(include_entities!=null)
-           parameters.put(URLEncoder.encode("include_entities","UTF-8"), URLEncoder.encode(include_entities,"UTF-8"));
+
         if(oauth_consumer_key!=null)
             parameters.put(URLEncoder.encode("oauth_consumer_key","UTF-8"), URLEncoder.encode(oauth_consumer_key,"UTF-8"));
         if(oauth_nonce!=null)
