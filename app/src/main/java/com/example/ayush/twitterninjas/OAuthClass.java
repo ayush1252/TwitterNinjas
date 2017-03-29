@@ -52,6 +52,13 @@ public class OAuthClass {
     String Authheader;
     HashMap<String,String> body;
 
+    public OAuthClass setQuery(HashMap<String, String> query) {
+        this.query = query;
+        return this;
+    }
+
+    HashMap<String,String> query;
+
     String oauth_consumer_key;
     String oauth_nonce;
     String oauth_signature_method;
@@ -178,6 +185,15 @@ public class OAuthClass {
             parameters.put(URLEncoder.encode("oauth_version","UTF-8"), URLEncoder.encode(oauth_version,"UTF-8"));
         if(body!=null) {
             Iterator it = body.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                parameters.put(URLEncoder.encode((String) pair.getKey(), "UTF-8").replace("+", "%20"), URLEncoder.encode((String) pair.getValue(), "UTF-8").replace("+", "%20"));
+
+            }
+        }
+
+        if(query!=null) {
+            Iterator it = query.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry pair = (Map.Entry) it.next();
                 parameters.put(URLEncoder.encode((String) pair.getKey(), "UTF-8").replace("+", "%20"), URLEncoder.encode((String) pair.getValue(), "UTF-8").replace("+", "%20"));
