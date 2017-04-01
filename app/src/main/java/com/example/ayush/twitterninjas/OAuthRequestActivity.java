@@ -5,58 +5,112 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.twitter.sdk.android.core.Callback;
+import com.twitter.sdk.android.core.Result;
+import com.twitter.sdk.android.core.TwitterException;
+
+import java.io.IOException;
+import java.lang.reflect.Modifier;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 import java.util.HashMap;
 
-public class OAuthRequestActivity extends AppCompatActivity {
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import retrofit2.Call;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
+public class OAuthRequestActivity extends AppCompatActivity {
+    static OAuthClass oAuthClass;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_oauth_request);
-        OAuthClass oAuthClass= new OAuthClass();
+      oAuthClass=new OAuthClass();
 
         try {
-
-            HashMap<String,String> body=new HashMap<>();
-            body.put("status","Hello Ladies + Gentlemen, a signed OAuth request!");//parameters that go in a body of request
-
-            HashMap<String,String> query=new HashMap<>();
-            query.put("include_entities","true");
             
-            String header=oAuthClass.setMethod("POST")
-                            .setConsumersecret("kAcSOqF21Fu85e7zjz7ZN2U4ZRhfV3WpwPAoE3Z7kBw")
-                            .setTokensecret("LswwdoUaIvS8ltyTt5jkRh4J50vUPVVHtR2YPi5kE")
-                            .setOauth_consumer_key("xvz1evFS4wEEPTGEFPHBog")
-                            .setOauth_token("370773112-GmHxMAgYyLbNEtIKZeRNFsMKPR9EyMZeS9weJAEb")
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .addInterceptor(new Interceptor() {
+                        @Override
+                        public Response intercept(Chain chain) throws IOException {
+
+                                Request request = chain.request();
+                            try {
+                                request = request.newBuilder()
+                                        .addHeader("Authorization", oAuthClass.getAuthheader())
+                                        .addHeader("Content-Type","application/json")
+                                        .build();
+                            } catch (NoSuchAlgorithmException e) {
+                                e.printStackTrace();
+                            } catch (SignatureException e) {
+                                e.printStackTrace();
+                            } catch (InvalidKeyException e) {
+                                e.printStackTrace();
+                            }
+                            Response e =  chain.proceed(request);
+                                return e;
+                            }
+
+                    })
+                .build();
+
+            Gson gson = new GsonBuilder().excludeFieldsWithModifiers(Modifier.TRANSIENT).create();
+
+            Retrofit retrofit = new Retrofit.Builder().baseUrl(" https://api.twitter.com/1.1/")
+                    .addConverterFactory(GsonConverterFactory.create(gson)).client(client)
+                    .build();
+
+
+
+            ApiInterface apiInterface = retrofit.create(ApiInterface.class);
+
+
+            oAuthClass=oAuthClass
+                            .setConsumersecret("GqGwo5fbAGxhrHFpFwcctuVfK7vWX5PQJD8c16TdslyhNFoDzX")
+                            .setTokensecret("RwZWKwcq2i4OcGiU2Eh9MNiXuNN9SYnqg57GvkkDmV33l")
+                            .setOauth_consumer_key("BkgJ2OWMLen9kBiaCE6zWL1Kd")
+                            .setOauth_token("1612537346-y5C72VPrTD4VnO8Yw04gsw1XdTgVQvefxascm3A")
                             .setOauth_signature_method("HMAC-SHA1")
-                            .setOauth_version("1.0")
+                            .setOauth_version("1.0");
 
-                            .setOauth_nonce("kYjzVBB8Y0ZFabxSWbWovY3uYSQ2pTgmZeNu2VS4cg")//should be a random string everytime
-                            .setOauth_timestamp("1318622958") //current epoch time
-                            .setBody(body) //set to null if there is no request body
-                            .setBaseurl("https://api.twitter.com/1/statuses/update.json")//Complete API endpoint which is being hit
-                            .setQuery(query)//Query Paremeters for the request-set to null if not any
-                            .getAuthheader();
+            oAuthClass=oAuthClass.setMethod("GET")
+                    .setOauth_nonce("0Iaq2Q")//should be a random string everytime
+                    .setOauth_timestamp("1491030263") //current epoch time
+                    .setBody(null) //set to null if there is no request body
+                    .setBaseurl("https://api.twitter.com/1.1/account/settings.json")//Complete API endpoint which is being hit
+                    .setQuery(null);//Query Paremeters for the request-set to null if not any
 
-            Log.d("lala",header);
+            Call<SettingsUser> showsettings = apiInterface.showsettings();
+            showsettings.enqueue(new Callback<SettingsUser>() {
+                @Override
+                public void success(Result<SettingsUser> result) {
+                    retrofit2.Response response = result.response;
+                   SettingsUser user= (SettingsUser) response.body();
+                    Log.d("lala",user.getDiscoverable_by_email()+user.getScreen_name());
+                }
 
-            /*Now this header string will be added as a header as {Authorization: header string} to each request
-            Set the 4 keys ,request & signature method , version only once while making the oAuthObject or making the first request
+                @Override
+                public void failure(TwitterException exception) {
+                    Log.d("lala",exception.getMessage().toString());
+                    Log.d("lala",exception.toString());
 
-            This whole header calculation can be done in the API interface of retrofit while using one oAuthClass object
+                }
+            });
 
-            Refer to the link https://dev.twitter.com/oauth/overview/authorizing-requests for more details
-            */
 
-            Log.d("lala",oAuthClass.displaySignature());
-            /*This function displays the signature that is generated internally using the oAuth header and other details
-
-            Refer to https://dev.twitter.com/oauth/overview/creating-signatures for more details
-            */
 
         } catch (Exception e) {
             Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
     }
+
+
 }
